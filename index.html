@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MotionLab 11А — Симулятор движения</title>
+
+<style>
+*{
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#070b16;
+    color:white;
+}
+
+header{
+    position:sticky;
+    top:0;
+    z-index:100;
+    background:rgba(7,11,22,.92);
+    backdrop-filter:blur(15px);
+    border-bottom:1px solid rgba(255,255,255,.1);
+}
+
+nav{
+    max-width:1200px;
+    margin:auto;
+    min-height:70px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:10px 20px;
+}
+
+.logo{
+    font-size:22px;
+    font-weight:bold;
+}
+
+.logo span{
+    color:#22d3ee;
+}
+
+.links{
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+}
+
+.links a{
+    color:#b9c2d8;
+    text-decoration:none;
+}
+
+.links a:hover{
+    color:white;
+}
+
+section{
+    max-width:1200px;
+    margin:auto;
+    padding:70px 20px;
+}
+
+.hero{
+    min-height:600px;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.badge{
+    width:max-content;
+    padding:8px 15px;
+    border-radius:50px;
+    background:rgba(124,58,237,.15);
+    border:1px solid rgba(124,58,237,.4);
+    color:#d8c7ff;
+}
+
+h1{
+    font-size:clamp(45px,8vw,85px);
+    max-width:950px;
+    margin:20px 0;
+    line-height:1;
+}
+
+.gradient{
+    background:linear-gradient(90deg,#fff,#bca7ff,#67e8f9);
+    -webkit-background-clip:text;
+    color:transparent;
+}
+
+.hero p{
+    color:#a8b1c7;
+    font-size:19px;
+    max-width:750px;
+    line-height:1.7;
+}
+
+.button{
+    display:inline-block;
+    border:0;
+    padding:13px 19px;
+    border-radius:13px;
+    cursor:pointer;
+    color:white;
+    text-decoration:none;
+    background:#182036;
+    border:1px solid rgba(255,255,255,.1);
+}
+
+.button.primary{
+    background:linear-gradient(135deg,#7c3aed,#5b21b6);
+}
+
+.hero-buttons{
+    display:flex;
+    gap:12px;
+    margin-top:20px;
+}
+
+h2{
+    font-size:40px;
+    margin-bottom:10px;
+}
+
+.subtitle{
+    color:#9ca6bd;
+    max-width:760px;
+    line-height:1.7;
+    margin-bottom:30px;
+}
+
+.simulator{
+    display:grid;
+    grid-template-columns:1fr 340px;
+    gap:20px;
+}
+
+.panel{
+    background:#101729;
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:24px;
+    overflow:hidden;
+}
+
+.tabs{
+    padding:15px;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.tab{
+    padding:10px 13px;
+    border-radius:10px;
+    background:#151d32;
+    border:1px solid rgba(255,255,255,.08);
+    color:#a8b1c7;
+    cursor:pointer;
+}
+
+.tab.active{
+    background:#7c3aed;
+    color:white;
+}
+
+canvas{
+    width:100%;
+    height:500px;
+    display:block;
+    background:
+    linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);
+    background-size:30px 30px;
+}
+
+.controls{
+    padding:22px;
+}
+
+.control{
+    margin-bottom:20px;
+}
+
+.control label{
+    display:flex;
+    justify-content:space-between;
+    color:#b9c2d8;
+    margin-bottom:9px;
+}
+
+input[type="range"]{
+    width:100%;
+    accent-color:#7c3aed;
+}
+
+.actions{
+    display:flex;
+    gap:10px;
+}
+
+.metrics{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:10px;
+    margin-top:20px;
+}
+
+.metric{
+    background:#151d30;
+    padding:12px;
+    border-radius:14px;
+}
+
+.metric small{
+    color:#8994ad;
+}
+
+.metric strong{
+    display:block;
+    margin-top:5px;
+}
+
+.description{
+    margin-top:18px;
+    background:rgba(34,211,238,.07);
+    padding:15px;
+    border-radius:14px;
+    color:#c9f8ff;
+    line-height:1.5;
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:16px;
+}
+
+.card{
+    padding:23px;
+    border-radius:20px;
+    background:#101729;
+    border:1px solid rgba(255,255,255,.08);
+}
+
+.card h3{
+    margin-top:0;
+}
+
+.card p{
+    color:#a8b1c7;
+    line-height:1.6;
+}
+
+.formula{
+    padding:12px;
+    border-radius:12px;
+    background:rgba(124,58,237,.12);
+    color:#ded5ff;
+    font-family:monospace;
+    margin-top:12px;
+}
+
+.theory{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+}
+
+.quiz{
+    display:grid;
+    grid-template-columns:1fr 300px;
+    gap:20px;
+}
+
+.quiz-main,
+.quiz-score{
+    background:#101729;
+    border:1px solid rgba(255,255,255,.08);
+    padding:25px;
+    border-radius:22px;
+}
+
+.progress{
+    height:8px;
+    border-radius:10px;
+    background:#1c253b;
+    overflow:hidden;
+    margin-bottom:25px;
+}
+
+.progress div{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg,#7c3aed,#22d3ee);
+}
+
+#question{
+    font-size:23px;
+    line-height:1.4;
+}
+
+.answers{
+    display:grid;
+    gap:10px;
+    margin-top:20px;
+}
+
+.answer{
+    padding:14px;
+    text-align:left;
+    border-radius:12px;
+    background:#151d30;
+    border:1px solid rgba(255,255,255,.08);
+    color:white;
+    cursor:pointer;
+}
+
+.answer:hover{
+    background:#1d2841;
+}
+
+.answer.correct{
+    background:rgba(52,211,153,.15);
+    border-color:#34d399;
+}
+
+.answer.wrong{
+    background:rgba(248,113,113,.15);
+    border-color:#f87171;
+}
+
+.feedback{
+    min-height:60px;
+    margin-top:15px;
+    color:#b6bfd3;
+    line-height:1.5;
+}
+
+.score-number{
+    font-size:45px;
+    font-weight:bold;
+}
+
+.author-box{
+    background:
+    linear-gradient(
+        135deg,
+        rgba(124,58,237,.18),
+        rgba(34,211,238,.1)
+    );
+    border:1px solid rgba(255,255,255,.1);
+    padding:30px;
+    border-radius:25px;
+}
+
+.authors{
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+}
+
+.author{
+    padding:12px 16px;
+    background:rgba(0,0,0,.2);
+    border-radius:12px;
+}
+
+footer{
+    text-align:center;
+    color:#7f899f;
+    padding:40px;
+}
+
+@media(max-width:900px){
+
+    .simulator,
+    .quiz{
+        grid-template-columns:1fr;
+    }
+
+    .grid{
+        grid-template-columns:1fr 1fr;
+    }
+
+    .theory{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:600px){
+
+    .links{
+        display:none;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+    }
+
+    canvas{
+        height:400px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<nav>
+
+<div class="logo">
+Motion<span>Lab</span> 11А
+</div>
+
+<div class="links">
+<a href="#simulator">Симулятор</a>
+<a href="#types">Виды движения</a>
+<a href="#theory">Теория</a>
+<a href="#test">Тест</a>
+<a href="#instruction">Инструкция</a>
+<a href="#authors">Авторы</a>
+</div>
+
+</nav>
+</header>
+
+<section class="hero">
+
+<div class="badge">
+⚡ Интерактивный проект по физике
+</div>
+
+<h1>
+<span class="gradient">
+Виртуальный симулятор движения
+</span>
+</h1>
+
+<p>
+Интерактивный сайт для изучения механического движения.
+Запускайте виртуальные эксперименты, меняйте скорость,
+ускорение и другие параметры, изучайте теорию и проходите тест.
+</p>
+
+<div class="hero-buttons">
+
+<a class="button primary" href="#simulator">
+Запустить симулятор
+</a>
+
+<a class="button" href="#theory">
+Изучить теорию
+</a>
+
+</div>
+
+</section>
+
+
+<section id="simulator">
+
+<h2>Виртуальный симулятор</h2>
+
+<p class="subtitle">
+Выберите вид движения и изменяйте его параметры.
+</p>
+
+<div class="simulator">
+
+<div class="panel">
+
+<div class="tabs">
+
+<button class="tab active" data-mode="uniform">
+Равномерное
+</button>
+
+<button class="tab" data-mode="accelerated">
+Ускоренное
+</button>
+
+<button class="tab" data-mode="circle">
+По окружности
+</button>
+
+<button class="tab" data-mode="throw">
+Бросок
+</button>
+
+</div>
+
+<canvas id="canvas"></canvas>
+
+</div>
+
+
+<div class="panel controls">
+
+<div class="control">
+
+<label>
+Скорость
+<span><span id="speedValue">6</span> м/с</span>
+</label>
+
+<input
+id="speed"
+type="range"
+min="1"
+max="20"
+value="6"
+step="1">
+
+</div>
+
+
+<div class="control" id="accelerationControl">
+
+<label>
+Ускорение
+<span><span id="accelerationValue">2</span> м/с²</span>
+</label>
+
+<input
+id="acceleration"
+type="range"
+min="0"
+max="8"
+value="2"
+step=".5">
+
+</div>
+
+
+<div class="control" id="angleControl">
+
+<label>
+Угол
+<span><span id="angleValue">45</span>°</span>
+</label>
+
+<input
+id="angle"
+type="range"
+min="10"
+max="80"
+value="45">
+
+</div>
+
+
+<div class="control" id="radiusControl">
+
+<label>
+Радиус
+<span><span id="radiusValue">120</span></span>
+</label>
+
+<input
+id="radius"
+type="range"
+min="60"
+max="180"
+value="120">
+
+</div>
+
+
+<div class="actions">
+
+<button id="play" class="button primary">
+▶ Запустить
+</button>
+
+<button id="reset" class="button">
+↺ Сбросить
+</button>
+
+</div>
+
+
+<div class="metrics">
+
+<div class="metric">
+<small>Время</small>
+<strong id="time">0.0 с</strong>
+</div>
+
+<div class="metric">
+<small>Путь</small>
+<strong id="distance">0.0 м</strong>
+</div>
+
+<div class="metric">
+<small>Скорость</small>
+<strong id="velocity">0.0 м/с</strong>
+</div>
+
+<div class="metric">
+<small>Ускорение</small>
+<strong id="accelerationMetric">0.0 м/с²</strong>
+</div>
+
+</div>
+
+<div class="description" id="description"></div>
+
+<label style="display:block;margin-top:15px">
+
+<input id="sound" type="checkbox" checked>
+
+Звуковые эффекты
+
+</label>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section id="types">
+
+<h2>Виды движения</h2>
+
+<p class="subtitle">
+Основные виды механического движения.
+</p>
+
+<div class="grid">
+
+<div class="card">
+<h3>→ Равномерное</h3>
+<p>
+Тело за одинаковые промежутки времени проходит одинаковые расстояния.
+Скорость постоянна.
+</p>
+</div>
+
+<div class="card">
+<h3>↗ Равноускоренное</h3>
+<p>
+Скорость тела изменяется на одинаковую величину
+за равные промежутки времени.
+</p>
+</div>
+
+<div class="card">
+<h3>◯ Движение по окружности</h3>
+<p>
+Траектория движения представляет собой окружность.
+Направление скорости постоянно изменяется.
+</p>
+</div>
+
+<div class="card">
+<h3>⌁ Криволинейное</h3>
+<p>
+Тело движется по кривой траектории.
+</p>
+</div>
+
+<div class="card">
+<h3>⬇ Свободное падение</h3>
+<p>
+Движение тела под действием силы тяжести.
+</p>
+</div>
+
+<div class="card">
+<h3>🎯 Бросок под углом</h3>
+<p>
+Движение одновременно происходит
+по горизонтали и вертикали.
+</p>
+</div>
+
+</div>
+
+</section>
+
+
+<section id="theory">
+
+<h2>Теория</h2>
+
+<p class="subtitle">
+Основные понятия и формулы по теме механического движения.
+</p>
+
+<div class="theory">
+
+<div class="card">
+
+<h3>Механическое движение</h3>
+
+<p>
+Механическое движение — изменение положения тела
+относительно других тел с течением времени.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h3>Траектория</h3>
+
+<p>
+Траектория — линия, по которой движется тело.
+Она может быть прямолинейной или криволинейной.
+</p>
+
+</div>
+
+
+<div class="card">
+
+<h3>Путь</h3>
+
+<p>
+Путь — длина траектории, пройденной телом.
+</p>
+
+<div class="formula">
+s = v · t
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Скорость</h3>
+
+<p>
+Скорость показывает, какое расстояние тело проходит
+за единицу времени.
+</p>
+
+<div class="formula">
+v = s / t
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Ускорение</h3>
+
+<p>
+Ускорение показывает скорость изменения скорости тела.
+</p>
+
+<div class="formula">
+a = (v - v₀) / t
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Равноускоренное движение</h3>
+
+<p>
+При постоянном ускорении скорость тела
+изменяется равномерно.
+</p>
+
+<div class="formula">
+v = v₀ + at
+</div>
+
+<div class="formula">
+s = v₀t + at² / 2
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Свободное падение</h3>
+
+<p>
+У поверхности Земли ускорение свободного падения приблизительно равно:
+</p>
+
+<div class="formula">
+g ≈ 9,8 м/с²
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h3>Движение по окружности</h3>
+
+<p>
+При движении по окружности вектор мгновенной скорости
+направлен по касательной, а центростремительное ускорение —
+к центру окружности.
+</p>
+
+<div class="formula">
+a = v² / R
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section id="test">
+
+<h2>Проверка знаний</h2>
+
+<p class="subtitle">
+Ответьте на 10 вопросов и узнайте свой результат.
+</p>
+
+<div class="quiz">
+
+<div class="quiz-main">
+
+<div class="progress">
+<div id="progress"></div>
+</div>
+
+<div id="counter">
+Вопрос 1 из 10
+</div>
+
+<h3 id="question"></h3>
+
+<div class="answers" id="answers"></div>
+
+<div class="feedback" id="feedback"></div>
+
+<button
+id="next"
+class="button primary"
+style="display:none">
+Следующий вопрос
+</button>
+
+<div id="result" style="display:none">
+
+<h2 id="resultTitle"></h2>
+
+<p id="resultText"></p>
+
+<button
+id="restart"
+class="button primary">
+Пройти ещё раз
+</button>
+
+</div>
+
+</div>
+
+
+<div class="quiz-score">
+
+<div>Ваш результат</div>
+
+<div class="score-number" id="score">
+0/10
+</div>
+
+<p>
+Правильных:
+<strong id="correct">0</strong>
+</p>
+
+<p>
+Ошибок:
+<strong id="wrong">0</strong>
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+
+<section id="instruction">
+
+<h2>Инструкция</h2>
+
+<div class="grid">
+
+<div class="card">
+<h3>1. Выберите движение</h3>
+<p>
+Нажмите на нужный вид движения в симуляторе.
+</p>
+</div>
+
+<div class="card">
+<h3>2. Измените параметры</h3>
+<p>
+Настройте скорость, ускорение, угол или радиус.
+</p>
+</div>
+
+<div class="card">
+<h3>3. Запустите</h3>
+<p>
+Нажмите кнопку «Запустить».
+</p>
+</div>
+
+<div class="card">
+<h3>4. Изучите результат</h3>
+<p>
+Следите за временем, скоростью и пройденным путём.
+</p>
+</div>
+
+<div class="card">
+<h3>5. Изучите теорию</h3>
+<p>
+Посмотрите определения и основные формулы.
+</p>
+</div>
+
+<div class="card">
+<h3>6. Пройдите тест</h3>
+<p>
+Ответьте на вопросы и проверьте свои знания.
+</p>
+</div>
+
+</div>
+
+</section>
+
+
+<section id="authors">
+
+<div class="author-box">
+
+<h2>
+Проект выполнили ученики 11А класса
+</h2>
+
+<p>
+Учебный проект по физике
+«Виртуальный симулятор движения и его видов».
+</p>
+
+<div class="authors">
+
+<div class="author">
+Русинов Давид
+</div>
+
+<div class="author">
+Николаев Костя
+</div>
+
+</div>
+
+</div>
+
+</section>
+
+
+<footer>
+MotionLab 11А · Виртуальный симулятор движения
+</footer>
+
+
+<script>
+
+const canvas =
+document.getElementById("canvas");
+
+const ctx =
+canvas.getContext("2d");
+
+const speed =
+document.getElementById("speed");
+
+const acceleration =
+document.getElementById("acceleration");
+
+const angle =
+document.getElementById("angle");
+
+const radius =
+document.getElementById("radius");
+
+let mode="uniform";
+let running=false;
+let time=0;
+let lastTime=performance.now();
+
+let audioContext=null;
+
+
+function sound(freq){
+
+    if(!document.getElementById("sound").checked)
+        return;
+
+    if(!audioContext){
+
+        audioContext=
+        new (
+            window.AudioContext ||
+            window.webkitAudioContext
+        )();
+
+    }
+
+    const osc=
+    audioContext.createOscillator();
+
+    const gain=
+    audioContext.createGain();
+
+    osc.frequency.value=freq;
+
+    gain.gain.value=.03;
+
+    osc.connect(gain);
+
+    gain.connect(audioContext.destination);
+
+    osc.start();
+
+    gain.gain.exponentialRampToValueAtTime(
+        .0001,
+        audioContext.currentTime+.08
+    );
+
+    osc.stop(
+        audioContext.currentTime+.08
+    );
+
+}
+
+
+function resize(){
+
+    const ratio=
+    Math.min(
+        window.devicePixelRatio || 1,
+        2
+    );
+
+    canvas.width=
+    canvas.clientWidth * ratio;
+
+    canvas.height=
+    canvas.clientHeight * ratio;
+
+    ctx.setTransform(
+        ratio,0,0,ratio,0,0
+    );
+
+}
+
+window.addEventListener("resize",resize);
+
+resize();
+
+
+function reset(){
+
+    time=0;
+    running=false;
+
+    document.getElementById("play")
+    .textContent="▶ Запустить";
+
+    sound(350);
+
+}
+
+
+function drawBall(x,y){
+
+    ctx.shadowColor="#22d3ee";
+
+    ctx.shadowBlur=25;
+
+    const gradient=
+    ctx.createRadialGradient(
+        x-5,y-5,2,
+        x,y,22
+    );
+
+    gradient.addColorStop(
+        0,
+        "#ffffff"
+    );
+
+    gradient.addColorStop(
+        .4,
+        "#22d3ee"
+    );
+
+    gradient.addColorStop(
+        1,
+        "#7c3aed"
+    );
+
+    ctx.beginPath();
+
+    ctx.arc(
+        x,
+        y,
+        17,
+        0,
+        Math.PI*2
+    );
+
+    ctx.fillStyle=gradient;
+
+    ctx.fill();
+
+    ctx.shadowBlur=0;
+
+}
+
+
+function draw(){
+
+    const width=
+    canvas.clientWidth;
+
+    const height=
+    canvas.clientHeight;
+
+    ctx.clearRect(
+        0,
+        0,
+        width,
+        height
+    );
+
+    const v0=
+    Number(speed.value);
+
+    const a=
+    Number(acceleration.value);
+
+    let currentVelocity=v0;
+
+    let distance=0;
+
+
+    if(mode==="uniform"){
+
+        distance=
+        v0*time;
+
+        const x=
+        50+
+        (
+            distance*15
+        )%
+        (
+            width-100
+        );
+
+        drawBall(
+            x,
+            height*.65
+        );
+
+        currentVelocity=v0;
+
+        document.getElementById("description")
+        .textContent=
+        "Равномерное движение: скорость постоянна. Формула пути: s = v·t.";
+
+    }
+
+
+    if(mode==="accelerated"){
+
+        distance=
+        v0*time+
+        .5*a*time*time;
+
+        currentVelocity=
+        v0+a*time;
+
+        const x=
+        50+
+        (
+            distance*7
+        )%
+        (
+            width-100
+        );
+
+        drawBall(
+            x,
+            height*.65
+        );
+
+        document.getElementById("description")
+        .textContent=
+        "Равноускоренное движение: скорость изменяется со временем. v = v₀ + at.";
+
+    }
+
+
+    if(mode==="circle"){
+
+        const r=
+        Number(radius.value);
+
+        const centerX=
+        width/2;
+
+        const centerY=
+        height/2;
+
+        ctx.beginPath();
+
+        ctx.arc(
+            centerX,
+            centerY,
+            r,
+            0,
+            Math.PI*2
+        );
+
+        ctx.strokeStyle=
+        "rgba(124,58,237,.5)";
+
+        ctx.lineWidth=2;
+
+        ctx.stroke();
+
+        const angularSpeed=
+        v0/
+        Math.max(r/40,1);
+
+        const x=
+        centerX+
+        Math.cos(
+            time*angularSpeed
+        )*r;
+
+        const y=
+        centerY+
+        Math.sin(
+            time*angularSpeed
+        )*r;
+
+        drawBall(x,y);
+
+        distance=v0*time;
+
+        currentVelocity=v0;
+
+        document.getElementById("description")
+        .textContent=
+        "Движение по окружности: направление скорости постоянно изменяется.";
+
+    }
+
+
+    if(mode==="throw"){
+
+        const g=9.8;
+
+        const rad=
+        Number(angle.value)
+        *Math.PI/180;
+
+        const flightTime=
+        (
+            2*v0*Math.sin(rad)
+        )/g;
+
+        if(
+            time>flightTime
+            && running
+        ){
+
+            time=0;
+
+            sound(230);
+
+        }
+
+        const scale=12;
+
+        const xMeters=
+        v0*
+        Math.cos(rad)*
+        time;
+
+        const yMeters=
+        v0*
+        Math.sin(rad)*
+        time-
+        .5*g*time*time;
+
+        const x=
+        50+
+        xMeters*scale;
+
+        const y=
+        height*.78-
+        Math.max(
+            0,
+            yMeters
+        )*scale;
+
+        drawBall(
+            Math.min(
+                x,
+                width-30
+            ),
+            y
+        );
+
+        const vx=
+        v0*
+        Math.cos(rad);
+
+        const vy=
+        v0*
+        Math.sin(rad)-
+        g*time;
+
+        currentVelocity=
+        Math.sqrt(
+            vx*vx+
+            vy*vy
+        );
+
+        distance=v0*time;
+
+        document.getElementById("description")
+        .textContent=
+        "Бросок под углом: по горизонтали тело движется равномерно, а по вертикали действует ускорение свободного падения.";
+
+    }
+
+
+    document.getElementById("time")
+    .textContent=
+    time.toFixed(1)+" с";
+
+    document.getElementById("distance")
+    .textContent=
+    Math.max(
+        distance,
+        0
+    ).toFixed(1)+" м";
+
+    document.getElementById("velocity")
+    .textContent=
+    currentVelocity.toFixed(1)
+    +" м/с";
+
+    document.getElementById("accelerationMetric")
+    .textContent=
+    (
+        mode==="accelerated"
+        ? a
+        :
+        mode==="throw"
+        ? 9.8
+        :
+        0
+    ).toFixed(1)
+    +" м/с²";
+
+}
+
+
+function animate(now){
+
+    const delta=
+    Math.min(
+        (
+            now-lastTime
+        )/1000,
+        .03
+    );
+
+    lastTime=now;
+
+    if(running)
+        time+=delta;
+
+    draw();
+
+    requestAnimationFrame(
+        animate
+    );
+
+}
+
+requestAnimationFrame(animate);
+
+
+document
+.getElementById("play")
+.addEventListener(
+"click",
+function(){
+
+    running=!running;
+
+    this.textContent=
+    running
+    ? "⏸ Пауза"
+    : "▶ Продолжить";
+
+    sound(
+        running
+        ? 700
+        : 400
+    );
+
+});
+
+
+document
+.getElementById("reset")
+.addEventListener(
+"click",
+reset
+);
+
+
+document
+.querySelectorAll(".tab")
+.forEach(tab=>{
+
+    tab.addEventListener(
+    "click",
+    ()=>{
+
+        document
+        .querySelectorAll(".tab")
+        .forEach(
+            t=>
+            t.classList.remove(
+                "active"
+            )
+        );
+
+        tab.classList.add(
+            "active"
+        );
+
+        mode=
+        tab.dataset.mode;
+
+        document.getElementById(
+            "accelerationControl"
+        ).style.display=
+        mode==="accelerated"
+        ?"block"
+        :"none";
+
+        document.getElementById(
+            "angleControl"
+        ).style.display=
+        mode==="throw"
+        ?"block"
+        :"none";
+
+        document.getElementById(
+            "radiusControl"
+        ).style.display=
+        mode==="circle"
+        ?"block"
+        :"none";
+
+        reset();
+
+        sound(600);
+
+    });
+
+});
+
+
+function updateValues(){
+
+    document.getElementById(
+        "speedValue"
+    ).textContent=
+    speed.value;
+
+    document.getElementById(
+        "accelerationValue"
+    ).textContent=
+    acceleration.value;
+
+    document.getElementById(
+        "angleValue"
+    ).textContent=
+    angle.value;
+
+    document.getElementById(
+        "radiusValue"
+    ).textContent=
+    radius.value;
+
+}
+
+[
+    speed,
+    acceleration,
+    angle,
+    radius
+]
+.forEach(
+input=>
+input.addEventListener(
+    "input",
+    updateValues
+)
+);
+
+updateValues();
+
+document
+.querySelector(
+    '[data-mode="uniform"]'
+)
+.click();
+
+
+const questions=[
+
+{
+q:"Что называют механическим движением?",
+answers:[
+"Изменение положения тела относительно других тел с течением времени",
+"Изменение температуры тела",
+"Изменение массы тела",
+"Только увеличение скорости"
+],
+correct:0,
+info:"Механическое движение — изменение положения тела относительно других тел с течением времени."
+},
+
+{
+q:"Что остаётся постоянным при равномерном прямолинейном движении?",
+answers:[
+"Время",
+"Скорость",
+"Путь",
+"Координата"
+],
+correct:1,
+info:"При равномерном движении скорость постоянна."
+},
+
+{
+q:"Формула пути при равномерном движении:",
+answers:[
+"s = v · t",
+"s = v + t",
+"s = v / t",
+"s = a · t"
+],
+correct:0,
+info:"Путь при равномерном движении: s = v·t."
+},
+
+{
+q:"В каких единицах СИ измеряется ускорение?",
+answers:[
+"м",
+"м/с",
+"м/с²",
+"км"
+],
+correct:2,
+info:"Единица ускорения — метр в секунду в квадрате."
+},
+
+{
+q:"Куда направлено центростремительное ускорение?",
+answers:[
+"К центру окружности",
+"От центра",
+"По касательной",
+"Вертикально вверх"
+],
+correct:0,
+info:"Центростремительное ускорение направлено к центру окружности."
+},
+
+{
+q:"Что такое путь?",
+answers:[
+"Время движения",
+"Длина траектории",
+"Скорость",
+"Масса"
+],
+correct:1,
+info:"Путь — длина траектории, которую прошло тело."
+},
+
+{
+q:"Чему примерно равно ускорение свободного падения?",
+answers:[
+"1 м/с²",
+"5 м/с²",
+"9,8 м/с²",
+"100 м/с²"
+],
+correct:2,
+info:"У поверхности Земли g ≈ 9,8 м/с²."
+},
+
+{
+q:"Что происходит со скоростью при положительном постоянном ускорении?",
+answers:[
+"Увеличивается",
+"Всегда равна нулю",
+"Не изменяется",
+"Исчезает"
+],
+correct:0,
+info:"При положительном ускорении скорость увеличивается."
+},
+
+{
+q:"Как направлена скорость при движении по окружности?",
+answers:[
+"По касательной",
+"К центру",
+"От центра",
+"Всегда вниз"
+],
+correct:0,
+info:"Мгновенная скорость направлена по касательной к окружности."
+},
+
+{
+q:"Бросок под углом состоит из:",
+answers:[
+"Равномерного движения по горизонтали и равноускоренного по вертикали",
+"Только движения по окружности",
+"Только вертикального движения",
+"Двух движений по окружности"
+],
+correct:0,
+info:"По горизонтали скорость постоянна, а по вертикали действует сила тяжести."
+}
+
+];
+
+
+let questionIndex=0;
+
+let score=0;
+
+let answered=false;
+
+
+const question=
+document.getElementById(
+    "question"
+);
+
+const answers=
+document.getElementById(
+    "answers"
+);
+
+const feedback=
+document.getElementById(
+    "feedback"
+);
+
+const next=
+document.getElementById(
+    "next"
+);
+
+
+function showQuestion(){
+
+    answered=false;
+
+    const item=
+    questions[
+        questionIndex
+    ];
+
+    document.getElementById(
+        "counter"
+    ).textContent=
+    `Вопрос ${questionIndex+1} из ${questions.length}`;
+
+    question.textContent=
+    item.q;
+
+    answers.innerHTML="";
+
+    feedback.textContent="";
+
+    next.style.display="none";
+
+
+    item.answers.forEach(
+    (answer,index)=>{
+
+        const button=
+        document.createElement(
+            "button"
+        );
+
+        button.className=
+        "answer";
+
+        button.textContent=
+        answer;
+
+        button.addEventListener(
+        "click",
+        ()=>checkAnswer(
+            index,
+            button
+        )
+        );
+
+        answers.appendChild(
+            button
+        );
+
+    });
+
+    updateScore();
+
+}
+
+
+function checkAnswer(
+    selected,
+    button
+){
+
+    if(answered)
+        return;
+
+    answered=true;
+
+    const item=
+    questions[
+        questionIndex
+    ];
+
+    const buttons=
+    answers.querySelectorAll(
+        ".answer"
+    );
+
+
+    buttons.forEach(
+    (btn,index)=>{
+
+        btn.disabled=true;
+
+        if(
+            index===
+            item.correct
+        ){
+
+            btn.classList.add(
+                "correct"
+            );
+
+        }
+
+    });
+
+
+    if(
+        selected===
+        item.correct
+    ){
+
+        score++;
+
+        feedback.textContent=
+        "Верно! "+
+        item.info;
+
+        sound(850);
+
+    }else{
+
+        button.classList.add(
+            "wrong"
+        );
+
+        feedback.textContent=
+        "Неверно. "+
+        item.info;
+
+        sound(250);
+
+    }
+
+
+    next.style.display=
+    "inline-block";
+
+    next.textContent=
+    questionIndex===
+    questions.length-1
+    ?
+    "Показать результат"
+    :
+    "Следующий вопрос";
+
+    updateScore();
+
+}
+
+
+function updateScore(){
+
+    document.getElementById(
+        "score"
+    ).textContent=
+    score+
+    "/"+
+    questions.length;
+
+    document.getElementById(
+        "correct"
+    ).textContent=
+    score;
+
+    const done=
+    questionIndex+
+    (
+        answered
+        ?1
+        :0
+    );
+
+    document.getElementById(
+        "wrong"
+    ).textContent=
+    done-score;
+
+    document.getElementById(
+        "progress"
+    ).style.width=
+    (
+        done/
+        questions.length*
+        100
+    )+"%";
+
+}
+
+
+next.addEventListener(
+"click",
+()=>{
+
+    if(
+        questionIndex<
+        questions.length-1
+    ){
+
+        questionIndex++;
+
+        showQuestion();
+
+    }else{
+
+        finishTest();
+
+    }
+
+});
+
+
+function finishTest(){
+
+    question.style.display=
+    "none";
+
+    answers.style.display=
+    "none";
+
+    feedback.style.display=
+    "none";
+
+    next.style.display=
+    "none";
+
+    const result=
+    document.getElementById(
+        "result"
+    );
+
+    result.style.display=
+    "block";
+
+
+    const percent=
+    Math.round(
+        score/
+        questions.length*
+        100
+    );
+
+
+    let title=
+    "Стоит повторить теорию";
+
+
+    if(percent>=90){
+
+        title=
+        "Отлично!";
+
+    }else if(
+        percent>=70
+    ){
+
+        title=
+        "Очень хорошо!";
+
+    }else if(
+        percent>=50
+    ){
+
+        title=
+        "Неплохо!";
+
+    }
+
+
+    document.getElementById(
+        "resultTitle"
+    ).textContent=
+    title;
+
+
+    document.getElementById(
+        "resultText"
+    ).textContent=
+    `Правильных ответов: ${score} из ${questions.length}. Результат: ${percent}%.`;
+
+}
+
+
+document
+.getElementById(
+    "restart"
+)
+.addEventListener(
+"click",
+()=>{
+
+    questionIndex=0;
+
+    score=0;
+
+    document.getElementById(
+        "result"
+    ).style.display=
+    "none";
+
+    question.style.display=
+    "block";
+
+    answers.style.display=
+    "grid";
+
+    feedback.style.display=
+    "block";
+
+    showQuestion();
+
+});
+
+
+showQuestion();
+
+</script>
+
+</body>
+</html>
